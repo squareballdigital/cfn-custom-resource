@@ -48,6 +48,14 @@ export abstract class CustomResourceHandlerBase<Props, Attribs = void> {
     this._physicalResourceId = value;
   }
 
+  private _requestId: string | undefined;
+  protected get requestId(): string {
+    if (!this._requestId) {
+      throw new Error(`requestId has not been set`);
+    }
+    return this._requestId;
+  }
+
   private _stackId: string | undefined;
   protected get stackId(): string {
     if (!this._stackId) {
@@ -100,6 +108,8 @@ export abstract class CustomResourceHandlerBase<Props, Attribs = void> {
     event: CloudFormationCustomResourceEvent,
     context: Context,
   ): Promise<void> {
+    this._requestId = event.RequestId;
+
     if (event.RequestType === 'Create') {
       this.physicalResourceId = makePhysicalResourceId(
         event.StackId,
